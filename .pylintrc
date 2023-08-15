@@ -1,0 +1,7 @@
+[MESSAGES CONTROL]
+# Reason for disable 'not-callable'
+# https://github.com/PyCQA/pylint/issues/1493
+disable=broad-exception-raised, logging-fstring-interpolation
+
+[DESIGN]
+max-args=10
