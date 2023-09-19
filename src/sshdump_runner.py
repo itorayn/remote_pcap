@@ -37,7 +37,7 @@ class SSHDumpRunner(ProcessRunner):
             cmd.extend(['--sshkey', self.key_file])
         else:
             cmd.extend(['--remote-password', self.password])
-        cmd.extend(['--remote-capture-command', 
+        cmd.extend(['--remote-capture-command',
                     f'/usr/bin/tcpdump -i {self.iface} -U -w - -f not tcp port 22'])
         return cmd
 

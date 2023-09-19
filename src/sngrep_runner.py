@@ -1,4 +1,3 @@
-import logging
 import os
 
 from process_runner import ProcessRunner
@@ -13,7 +12,7 @@ class SngrepRunner(ProcessRunner):
     def args(self):
         shell_pid = os.getppid()
 
-        with open(f'/proc/{shell_pid}/status') as info:
+        with open(f'/proc/{shell_pid}/status', encoding="ascii") as info:
             for line in info:
                 if line.startswith('PPid:'):
                     _, _, terminal_pid = line.partition(':')
@@ -22,7 +21,7 @@ class SngrepRunner(ProcessRunner):
             else:
                 raise Exception(f'Failed to parse /proc/{shell_pid}/status')
 
-        with open(f'/proc/{terminal_pid}/status') as info:
+        with open(f'/proc/{terminal_pid}/status', encoding="ascii") as info:
             for line in info:
                 if line.startswith('Name:'):
                     _, _, terminal_name = line.partition(':')
@@ -30,12 +29,12 @@ class SngrepRunner(ProcessRunner):
                     break
             else:
                 raise Exception(f'Failed to parse /proc/{shell_pid}/status')
-        
+
         if terminal_name.startswith('gnome-terminal'):
             cmd = ['gnome-terminal', '--wait', '--']
         else:
             raise Exception(f'Unknown terminal emulator: {terminal_name}')
-        
+
         cmd.extend(['/usr/bin/sngrep', '--rtp' ,'--input', self.pipename])
 
         return cmd

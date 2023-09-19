@@ -57,7 +57,7 @@ class ProcessRunner(ABC):
         else:
             self.logger.error(f'Failed to stop process with pid {pid}')
             raise Exception(f'Failed to stop process with pid {pid}')
-        
+
         if self.out_reader.is_alive():
             self.out_reader.stop()
 

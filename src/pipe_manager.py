@@ -15,5 +15,5 @@ class Pipe():
         mkfifo(self.fifo_path)
         return self.fifo_path
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, exc_type, exc_value, exc_traceback):
         remove(self.fifo_path)
