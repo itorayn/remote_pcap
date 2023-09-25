@@ -1,7 +1,10 @@
 [MESSAGES CONTROL]
-# Reason for disable 'not-callable'
-# https://github.com/PyCQA/pylint/issues/1493
-disable=broad-exception-raised, logging-fstring-interpolation
+disable=logging-fstring-interpolation,
+        duplicate-code,
+        missing-module-docstring,
+        missing-class-docstring,
+        missing-function-docstring
 
 [DESIGN]
 max-args=10
+max-attributes=10

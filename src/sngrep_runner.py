@@ -1,5 +1,6 @@
 import os
 
+from exceptions import ParseProcFSError
 from process_runner import ProcessRunner
 
 
@@ -19,7 +20,7 @@ class SngrepRunner(ProcessRunner):
                     terminal_pid = int(terminal_pid.strip())
                     break
             else:
-                raise Exception(f'Failed to parse /proc/{shell_pid}/status')
+                raise ParseProcFSError(f'Failed to parse /proc/{shell_pid}/status')
 
         with open(f'/proc/{terminal_pid}/status', encoding="ascii") as info:
             for line in info:
@@ -28,14 +29,14 @@ class SngrepRunner(ProcessRunner):
                     terminal_name = terminal_name.strip()
                     break
             else:
-                raise Exception(f'Failed to parse /proc/{shell_pid}/status')
+                raise ParseProcFSError(f'Failed to parse /proc/{shell_pid}/status')
 
         if terminal_name.startswith('gnome-terminal'):
             cmd = ['gnome-terminal', '--wait', '--']
         else:
-            raise Exception(f'Unknown terminal emulator: {terminal_name}')
+            raise NameError(f'Unknown terminal emulator: {terminal_name}')
 
-        cmd.extend(['/usr/bin/sngrep', '--rtp' ,'--input', self.pipename])
+        cmd.extend(['/usr/bin/sngrep', '--rtp', '--input', self.pipename])
 
         return cmd
 

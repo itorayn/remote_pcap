@@ -3,11 +3,12 @@ from abc import ABC, abstractmethod
 from subprocess import Popen, DEVNULL, PIPE, TimeoutExpired
 
 from buffer_reader import BufferReader
+from exceptions import StopError
 
 
 class ProcessRunner(ABC):
 
-    def __init__(self, name, **kwargs):
+    def __init__(self, name):
         self.name = name
         self.logger = logging.getLogger(self.name)
         self.process = None
@@ -29,6 +30,7 @@ class ProcessRunner(ABC):
 
     def run(self):
         self.logger.info('Starting ...')
+        # pylint: disable-next=consider-using-with
         self.process = Popen(self.args, stdin=DEVNULL, stdout=PIPE, stderr=PIPE)
         self.out_reader = BufferReader(name=f'{self.name}.stdout_reader',
                                        buffer=self.process.stdout,
@@ -56,7 +58,7 @@ class ProcessRunner(ABC):
                 break
         else:
             self.logger.error(f'Failed to stop process with pid {pid}')
-            raise Exception(f'Failed to stop process with pid {pid}')
+            raise StopError(f'Failed to stop process with pid {pid}')
 
         if self.out_reader.is_alive():
             self.out_reader.stop()

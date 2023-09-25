@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.DEBUG, format=('%(asctime)s %(name)s %(levelna
 
 parser = ArgumentParser(description='Videos to images')
 parser.add_argument('remote', type=str, help='Capture in host address')
-parser.add_argument('-i', '--interface', type=str,  dest='iface',
+parser.add_argument('-i', '--interface', type=str,  dest='remote_iface',
                     required=True, help='Capture in interface')
 parser.add_argument('-u', '--username', type=str, dest='username',
                     required=True, help='Username for login')
@@ -44,7 +44,14 @@ class ToolRunner(Thread):
         self.logger.info('Starting ...')
 
         with Pipe() as fifo_path:
-            self.dumper = SSHDumpRunner('dumper', **vars(self.args), pipename=fifo_path)
+            self.dumper = SSHDumpRunner('dumper',
+                                        remote_host=self.args.remote_host,
+                                        remote_port=self.args.remote_port,
+                                        iface=self.args.remote_iface,
+                                        username=self.args.username,
+                                        password=self.args.password,
+                                        use_key=self.args.use_key,
+                                        pipename=fifo_path)
             self.dumper.run()
 
             if self.args.analyzer == 'wireshark':
@@ -52,7 +59,7 @@ class ToolRunner(Thread):
             elif self.args.analyzer == 'sngrep':
                 self.analyzer = SngrepRunner('sngrep', pipename=fifo_path)
             else:
-                raise Exception(f'Unknown packet analyzer: {self.args.analyzer}')
+                raise AttributeError(f'Unknown packet analyzer: {self.args.analyzer}')
             self.analyzer.run()
 
             while self._need_stop.wait(1) is False:

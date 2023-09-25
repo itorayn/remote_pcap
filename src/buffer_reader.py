@@ -5,7 +5,7 @@ from threading import Thread
 
 class BufferReader(Thread):
 
-    def __init__(self, name: str, buffer, data_handler = None):
+    def __init__(self, name: str, buffer, data_handler=None):
         Thread.__init__(self, name=name, daemon=True)
         self.logger = logging.getLogger(self.name)
         self.buffer = buffer
@@ -19,7 +19,7 @@ class BufferReader(Thread):
         self.logger.info('Starting ...')
         file_descriptor = self.buffer.fileno()
         epoll = select.epoll()
-        epoll.register(file_descriptor, select.EPOLLIN|select.EPOLLHUP)
+        epoll.register(file_descriptor, select.EPOLLIN | select.EPOLLHUP)
 
         while self._need_stop is False:
             for fileno, event in epoll.poll(1):
@@ -27,7 +27,6 @@ class BufferReader(Thread):
                     self.logger.error(f'Recived epoll data with unknown file descriptor {fileno}')
                     continue
                 if event & select.EPOLLIN:
-                    #self.logger.debug('Avaliable new data, read...')
                     while True:
                         data = self.buffer.readline()
                         if data == b'':
