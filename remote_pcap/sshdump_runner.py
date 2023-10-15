@@ -1,9 +1,9 @@
 import os
 from typing import Union, Dict
 
-from exceptions import ParseMessageError
-from wireshark_runner import WiresharkRunner
-from log_patterns import process_timestamp, subsystem_level, filename_lineno_func_msg, only_message
+from .exceptions import ParseMessageError
+from .wireshark_runner import WiresharkRunner
+from .log_patterns import process_timestamp, subsystem_level, filename_lineno_func_msg, only_message
 
 
 class SSHDumpRunner(WiresharkRunner):

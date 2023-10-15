@@ -1,11 +1,16 @@
 # remote_pcap
 
-Утилита для удобного удаленного захвава траффика и отображение его в одном из анализаторов (wireshark, sngrep).
+Утилита для удобного удаленного захвата трафика и отображения его в одном из анализаторов (wireshark, sngrep).
+
+## install
+```
+pip3 install .
+```
 
 
 ## usage
 ```
-usage: remote_pcap.py [-h] -i REMOTE_IFACE -u USERNAME (-p PASSWORD | -k) [-a {wireshark,sngrep}] remote
+usage: remote_pcap [-h] -i REMOTE_IFACE -u USERNAME (-p PASSWORD | -k) [-a {wireshark,sngrep}] remote
 
 Videos to images
 
@@ -28,5 +33,5 @@ options:
 
 ## Пример запуска
 ```
-python3 remote_pcap.py -i lo -u user -k -a sngrep 127.0.0.1:5022
+remote_pcap -i lo -u user -k -a sngrep 127.0.0.1:5022
 ```

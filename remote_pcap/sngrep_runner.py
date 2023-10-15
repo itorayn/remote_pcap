@@ -1,7 +1,7 @@
 import os
 
-from exceptions import ParseProcFSError
-from process_runner import ProcessRunner
+from .exceptions import ParseProcFSError
+from .process_runner import ProcessRunner
 
 
 class SngrepRunner(ProcessRunner):

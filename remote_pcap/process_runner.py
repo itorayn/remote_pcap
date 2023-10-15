@@ -2,8 +2,8 @@ import logging
 from abc import ABC, abstractmethod
 from subprocess import Popen, DEVNULL, PIPE, TimeoutExpired
 
-from buffer_reader import BufferReader
-from exceptions import StopError
+from .buffer_reader import BufferReader
+from .exceptions import StopError
 
 
 class ProcessRunner(ABC):
