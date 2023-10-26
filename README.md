@@ -62,7 +62,7 @@ sudo setcap cap_net_raw,cap_net_admin=eip $(which tcpdump)
 
 ## Установка
 ```
-pip3 install -e git+https://github.com/itorayn/remote_pcap.git#egg=remote_pcap
+pip3 install git+https://github.com/itorayn/remote_pcap.git#egg=remote_pcap
 ```
 
 ## Usage
