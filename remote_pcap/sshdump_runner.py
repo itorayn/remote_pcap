@@ -31,7 +31,7 @@ class SSHDumpRunner(WiresharkRunner):
                '--log-level', 'debug',
                '--extcap-interface', 'ssh', '--fifo', self.pipename,
                '--remote-interface', self.iface, '--remote-host', self.remote_host,
-               '--remote-port', self.remote_port, '--remote-username', self.username]
+               '--remote-port', str(self.remote_port), '--remote-username', self.username]
         if self.use_key:
             cmd.extend(['--sshkey', self.key_file])
         else:
