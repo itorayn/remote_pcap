@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from typing import Dict, Union
+from typing import Dict, Optional, Union
 
 from .exceptions import ParseMessageError
 from .log_patterns import (filename_lineno_func_msg, only_message,
@@ -12,8 +12,8 @@ class SSHDumpRunner(WiresharkRunner):
 
     def __init__(self, name: str, pipename: str,
                  remote_host: str, remote_port: Union[str, int],
-                 iface: str, username: str, password: str = None,
-                 key_file: Union[Path, str] = None):
+                 iface: str, username: str, password: Optional[str] = None,
+                 key_file: Optional[Union[Path, str]] = None):
         super(WiresharkRunner, self).__init__(name)
         self.remote_host = remote_host
         self.remote_port = remote_port
