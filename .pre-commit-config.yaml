@@ -1,0 +1,23 @@
+default_stages: [pre-commit, manual]
+repos:
+-  repo: local
+   hooks:
+    - id: isort
+      name: isort
+      verbose: true
+      entry: isort
+      language: python
+      types: [python]
+    - id: flake8
+      name: flake8
+      verbose: true
+      entry: flake8
+      language: python
+      types: [python]
+      require_serial: true
+    - id: mypy
+      name: mypy
+      verbose: true
+      entry: mypy
+      language: python
+      types: [python]
