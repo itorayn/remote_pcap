@@ -4,12 +4,14 @@ repos:
    hooks:
     - id: isort
       name: isort
+      always_run: true
       verbose: true
       entry: isort
       language: python
       types: [python]
     - id: flake8
       name: flake8
+      always_run: true
       verbose: true
       entry: flake8
       language: python
@@ -17,6 +19,7 @@ repos:
       require_serial: true
     - id: mypy
       name: mypy
+      always_run: true
       verbose: true
       entry: mypy
       language: python
