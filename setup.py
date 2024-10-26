@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='remote_pcap',
-    version='1.0',
+    version='1.0.1',
     packages=find_packages(),
     long_description="Utility for easily capturing traffic remotely and displaying it.",
     author="Vladimir Muzyka",

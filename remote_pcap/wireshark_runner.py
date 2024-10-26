@@ -1,11 +1,11 @@
 import logging
-from typing import Dict
 from time import localtime, mktime, struct_time
+from typing import Dict
 
+from .exceptions import ConvertLogLevelError, ParseMessageError
+from .log_patterns import (filename_lineno_func_msg, level_without_subsystem,
+                           only_message, process_timestamp, subsystem_level)
 from .process_runner import ProcessRunner
-from .exceptions import ParseMessageError, ConvertLogLevelError
-from .log_patterns import (process_timestamp, subsystem_level, level_without_subsystem,
-                           filename_lineno_func_msg, only_message)
 
 
 class WiresharkRunner(ProcessRunner):

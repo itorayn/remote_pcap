@@ -1,28 +1,34 @@
 import os
-from typing import Union, Dict
+from pathlib import Path
+from typing import Dict, Union
 
 from .exceptions import ParseMessageError
+from .log_patterns import (filename_lineno_func_msg, only_message,
+                           process_timestamp, subsystem_level)
 from .wireshark_runner import WiresharkRunner
-from .log_patterns import process_timestamp, subsystem_level, filename_lineno_func_msg, only_message
 
 
 class SSHDumpRunner(WiresharkRunner):
 
-    def __init__(self, name: str, remote_host: str, remote_port: Union[str, int], iface: str,
-                 username: str, password: str, use_key: bool, pipename: str):
+    # pylint: disable-next=too-many-positional-arguments
+    def __init__(self, name: str, pipename: str,
+                 remote_host: str, remote_port: Union[str, int],
+                 iface: str, username: str, password: str = None,
+                 key_file: Union[Path, str] = None):
         super(WiresharkRunner, self).__init__(name)
         self.remote_host = remote_host
         self.remote_port = remote_port
         self.iface = iface
         self.username = username
+
+        if key_file is None:
+            if password is None:
+                raise AttributeError('Public key or password is not set!')
+        elif not os.path.exists(key_file):
+            raise FileNotFoundError(f'Key file is not exits: {key_file}')
+
         self.password = password
-        self.use_key = use_key
-        if self.use_key:
-            key_file = f'{os.getenv("HOME")}/.ssh/id_rsa.pub'
-            if os.path.exists(key_file):
-                self.key_file = key_file
-            else:
-                raise FileNotFoundError(f'Key file is not exits: {key_file}')
+        self.key_file = key_file
         self.pipename = pipename
 
     @property
@@ -32,7 +38,7 @@ class SSHDumpRunner(WiresharkRunner):
                '--extcap-interface', 'ssh', '--fifo', self.pipename,
                '--remote-interface', self.iface, '--remote-host', self.remote_host,
                '--remote-port', str(self.remote_port), '--remote-username', self.username]
-        if self.use_key:
+        if self.key_file:
             cmd.extend(['--sshkey', self.key_file])
         else:
             cmd.extend(['--remote-password', self.password])

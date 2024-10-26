@@ -1,6 +1,6 @@
 import logging
 from abc import ABC, abstractmethod
-from subprocess import Popen, DEVNULL, PIPE, TimeoutExpired
+from subprocess import DEVNULL, PIPE, Popen, TimeoutExpired
 
 from .buffer_reader import BufferReader
 from .exceptions import StopError

@@ -1,6 +1,5 @@
 import re
 
-
 process_timestamp = re.compile(r'\*\* \((?P<process>\w+):(?P<pid>\d+)\) '
                                r'(?P<hour>\d\d):(?P<mins>\d\d):(?P<secs>\d\d)\.'
                                r'(?P<microsecs>\d{6}) ')
