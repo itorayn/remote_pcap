@@ -10,7 +10,6 @@ from .wireshark_runner import WiresharkRunner
 
 class SSHDumpRunner(WiresharkRunner):
 
-    # pylint: disable-next=too-many-positional-arguments
     def __init__(self, name: str, pipename: str,
                  remote_host: str, remote_port: Union[str, int],
                  iface: str, username: str, password: str = None,
