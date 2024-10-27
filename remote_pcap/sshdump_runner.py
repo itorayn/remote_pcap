@@ -11,38 +11,37 @@ from .wireshark_runner import WiresharkRunner
 class SSHDumpRunner(WiresharkRunner):
 
     def __init__(self, name: str, pipename: str,
-                 remote_host: str, remote_port: Union[str, int],
-                 iface: str, username: str, password: Optional[str] = None,
-                 key_file: Optional[Union[Path, str]] = None):
+                 hostname: str, port: Union[str, int],
+                 interface: str, user: str, password: Optional[str] = None,
+                 identityfile: Optional[Union[Path, str]] = None):
         super(WiresharkRunner, self).__init__(name)
-        self.remote_host = remote_host
-        self.remote_port = remote_port
-        self.iface = iface
-        self.username = username
+        self.pipename = pipename
+        self.hostname = hostname
+        self.port = port
 
-        if key_file is None:
+        self.user = user
+        self.interface = interface
+        if identityfile is None:
             if password is None:
                 raise AttributeError('Public key or password is not set!')
-        elif not os.path.exists(key_file):
-            raise FileNotFoundError(f'Key file is not exits: {key_file}')
-
+        elif not os.path.exists(identityfile):
+            raise FileNotFoundError(f'Key file is not exits: {identityfile}')
         self.password = password
-        self.key_file = key_file
-        self.pipename = pipename
+        self.identityfile = identityfile
 
     @property
     def args(self):
         cmd = ['/usr/lib/x86_64-linux-gnu/wireshark/extcap/sshdump', '--capture',
                '--log-level', 'debug',
                '--extcap-interface', 'ssh', '--fifo', self.pipename,
-               '--remote-interface', self.iface, '--remote-host', self.remote_host,
-               '--remote-port', str(self.remote_port), '--remote-username', self.username]
-        if self.key_file:
-            cmd.extend(['--sshkey', self.key_file])
+               '--remote-interface', self.interface, '--remote-host', self.hostname,
+               '--remote-port', str(self.port), '--remote-username', self.user]
+        if self.identityfile:
+            cmd.extend(['--sshkey', self.identityfile])
         else:
             cmd.extend(['--remote-password', self.password])
         cmd.extend(['--remote-capture-command',
-                    f'/usr/bin/tcpdump -i {self.iface} -U -w - -f not tcp port 22'])
+                    f'/usr/bin/tcpdump -i {self.interface} -U -w - -f not tcp port 22'])
         return cmd
 
     @staticmethod

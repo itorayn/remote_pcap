@@ -17,7 +17,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pylint setuptools
+        pip install pylint paramiko setuptools
     - name: Analysing the code with pylint
       run: |
         pylint $(git ls-files '*.py')
@@ -53,7 +53,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install mypy
+        pip install mypy paramiko types-paramiko
     - name: Analyzing the code with mypy
       run: |
         mypy $(git ls-files '*.py')

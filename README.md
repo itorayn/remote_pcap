@@ -67,27 +67,28 @@ pip3 install git+https://github.com/itorayn/remote_pcap.git#egg=remote_pcap
 
 ## Usage
 ```
-usage: remote_pcap [-h] -i REMOTE_IFACE -u USERNAME (-p PASSWORD | -k) [-a {wireshark,sngrep}] remote
+usage: remote_pcap [-h] -i INTERFACE [-u USER] [-p PASSWORD] [-k] [-kf IDENTITYFILE] [-a {wireshark,sngrep}] REMOTE HOST
 
-Videos to images
+Remote capture network trafic
 
 positional arguments:
-  remote                Capture in host address
+  REMOTE HOST           Capture in host address
 
 options:
   -h, --help            show this help message and exit
-  -i REMOTE_IFACE, --interface REMOTE_IFACE
+  -i INTERFACE, --interface INTERFACE
                         Capture in interface
-  -u USERNAME, --username USERNAME
-                        Username for login
+  -u USER, --user USER  Username for login
   -p PASSWORD, --password PASSWORD
                         Password for login
   -k, --use-key         Use public key
+  -kf IDENTITYFILE, --identityfile IDENTITYFILE
+                        File with custom private key
   -a {wireshark,sngrep}, --analyzer {wireshark,sngrep}
                         Packet analyzer
 ```
 
 ## Пример запуска
 ```
-remote_pcap -i lo -u user -k -a sngrep 127.0.0.1:5022
+remote_pcap -i lo -u user -p password -a sngrep 127.0.0.1:5022
 ```
