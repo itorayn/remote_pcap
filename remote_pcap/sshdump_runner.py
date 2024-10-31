@@ -13,13 +13,15 @@ class SSHDumpRunner(WiresharkRunner):
     def __init__(self, name: str, pipename: str,
                  hostname: str, port: Union[str, int],
                  interface: str, user: str, password: Optional[str] = None,
-                 identityfile: Optional[Union[Path, str]] = None):
+                 identityfile: Optional[Union[Path, str]] = None,
+                 tcpdump_path: str = '/usr/bin/tcpdump'):
         super(WiresharkRunner, self).__init__(name)
         self.pipename = pipename
         self.hostname = hostname
         self.port = port
 
         self.user = user
+        self.tcpdump_path = tcpdump_path
         self.interface = interface
         if identityfile is None:
             if password is None:
@@ -34,14 +36,14 @@ class SSHDumpRunner(WiresharkRunner):
         cmd = ['/usr/lib/x86_64-linux-gnu/wireshark/extcap/sshdump', '--capture',
                '--log-level', 'debug',
                '--extcap-interface', 'ssh', '--fifo', self.pipename,
-               '--remote-interface', self.interface, '--remote-host', self.hostname,
-               '--remote-port', str(self.port), '--remote-username', self.user]
+               '--remote-host', self.hostname, '--remote-port', str(self.port),
+               '--remote-username', self.user]
         if self.identityfile:
             cmd.extend(['--sshkey', self.identityfile])
         else:
             cmd.extend(['--remote-password', self.password])
         cmd.extend(['--remote-capture-command',
-                    f'/usr/bin/tcpdump -i {self.interface} -U -w - -f not tcp port 22'])
+                    f'sudo {self.tcpdump_path} -i {self.interface} -U -w - -f not tcp port 22'])
         return cmd
 
     @staticmethod

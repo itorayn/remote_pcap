@@ -54,11 +54,8 @@ mkfifo /tmp/1234
 ## Требования
 1. На локальном хосте должен быть установлен wireshark и sngrep
 
-2. На удаленном хосте должен быть установлен tcpdump, а также должны быть предоставлены разрешения на захват трафика тому пользователю под учётными данными которого будет производиться подключение к удаленному хосту.
-```
-sudo setcap cap_net_raw,cap_net_admin=eip $(which tcpdump)
-```
-
+2. На удаленном хосте должен быть установлен tcpdump и sudo, а также должна быть возможность запустить tcpdump от имени суперпользователя через sudo без ввода пароля: `echo -e "${USER}\tALL=NOPASSWD: $(which tcpdump)" | sudo tee /etc/sudoers.d/tcpdump`
+На некоторых системах tcpdump устанавливается в /usr/sbin/. В данной директории which tcpdump не находит tcpdump при запуске от имени обычного пользователя, и тогда необходимо явно указать путь к tcpdump: `echo -e "${USER}\tALL=NOPASSWD: /usr/sbin/tcpdump" | sudo tee /etc/sudoers.d/tcpdump`
 
 ## Установка
 ```
@@ -67,7 +64,7 @@ pip3 install git+https://github.com/itorayn/remote_pcap.git#egg=remote_pcap
 
 ## Usage
 ```
-usage: remote_pcap [-h] -i INTERFACE [-u USER] [-p PASSWORD] [-k] [-kf IDENTITYFILE] [-a {wireshark,sngrep}] REMOTE HOST
+usage: remote_pcap [-h] -i INTERFACE [-u USER] [-p PASSWORD] [-k] [-a {wireshark,sngrep}] REMOTE HOST
 
 Remote capture network trafic
 
@@ -81,9 +78,7 @@ options:
   -u USER, --user USER  Username for login
   -p PASSWORD, --password PASSWORD
                         Password for login
-  -k, --use-key         Use public key
-  -kf IDENTITYFILE, --identityfile IDENTITYFILE
-                        File with custom private key
+  -k, --identityfile    File with custom private key
   -a {wireshark,sngrep}, --analyzer {wireshark,sngrep}
                         Packet analyzer
 ```

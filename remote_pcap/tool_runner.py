@@ -11,13 +11,15 @@ from .wireshark_runner import WiresharkRunner
 
 class ToolRunner(Thread):
     def __init__(self, name: str, hostname: str, port: Union[str, int], user: str, password: str,
-                 identityfile: Union[Path, str], interface: str, analyzer: str):
+                 identityfile: Union[Path, str], interface: str, analyzer: str,
+                 tcpdump_path: str = '/usr/bin/tcpdump'):
         Thread.__init__(self, name=name, daemon=True)
         self.logger = logging.getLogger(name)
         self.ssh_dump_kwargs = {
             'hostname': hostname,
             'port': port,
             'user': user,
+            'tcpdump_path': tcpdump_path,
             'interface': interface
         }
         if password is not None:
