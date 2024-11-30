@@ -17,9 +17,16 @@ def ssh_connection(hostname: str, port: Union[str, int],
                    identityfile: str, **_kwargs) -> Generator[SSHClient, None, None]:
     client = SSHClient()
     client.set_missing_host_key_policy(AutoAddPolicy())
-    client.connect(hostname=hostname, port=int(port),
-                   username=user, password=password, key_filename=identityfile)
+    if password is not None:
+        client.connect(hostname=hostname, port=int(port),
+                       username=user, password=password)
+    else:
+        assert identityfile is not None
+        client.connect(hostname=hostname, port=int(port),
+                       username=user, key_filename=str(identityfile))
+
     yield client
+
     client.close()
 
 
@@ -41,6 +48,20 @@ def get_remote_interfaces(connected_client: SSHClient) -> List[str]:
     return [link['ifname'] for link in links_info]
 
 
+def sudoers_config_is_work(connected_client: SSHClient) -> bool:
+    _, stdout, _ = connected_client.exec_command('sudo tcpdump --version')
+    version_info = stdout.read().decode(encoding='utf-8')
+    if version_info != '' and 'tcpdump version' in version_info:
+        logging.debug(f'tcpdump version in remote host: \n{version_info}')
+        return True
+
+    logging.critical('Cannot run "sudo tcpdump" without password.')
+    logging.info('Please run this command in remote host: '
+                 '"echo -e "${USER}\tALL=NOPASSWD: $(which tcpdump)" '
+                 '| sudo tee /etc/sudoers.d/tcpdump"')
+    return False
+
+
 def run_tool_runner():
     logging.basicConfig(level=logging.DEBUG, format=('%(asctime)s %(name)s %(levelname)s '
                                                      '%(filename)s:%(lineno)d %(message)s'))
@@ -49,8 +70,7 @@ def run_tool_runner():
     parser.add_argument('-i', '--interface', type=str, required=True, help='Capture in interface')
     parser.add_argument('-u', '--user', type=str, help='Username for login')
     parser.add_argument('-p', '--password', type=str, help='Password for login')
-    parser.add_argument('-k', '--identityfile', action='store_true',
-                        help='File with custom private key')
+    parser.add_argument('-k', '--identityfile', type=str, help='File with custom private key')
     parser.add_argument('-a', '--analyzer', type=str, default='wireshark',
                         choices=['wireshark', 'sngrep'], help='Packet analyzer')
     prog_args = parser.parse_args()
@@ -58,15 +78,17 @@ def run_tool_runner():
     if prog_args.password is not None and prog_args.identityfile is not None:
         parser.error('argument -k/--identityfile: not allowed with argument -p/--password')
 
-    ssh_dir = Path('~/.ssh/').expanduser()
+    # Prepare values from arguments
+    arg_vals = {}
+    if ':' in prog_args.remote:
+        arg_vals['hostname'], arg_vals['port'] = prog_args.remote.split(':')
+    else:
+        arg_vals['hostname'] = prog_args.remote
+    arg_vals['user'] = prog_args.user
+    arg_vals['password'] = prog_args.password
+    arg_vals['identityfile'] = prog_args.identityfile
 
-    # Prepare default value
-    default_vals = {
-        'port': 22,
-        'identityfile': next(filter(lambda fp: fp.name in ('id_rsa', 'id_dsa',
-                                                           'id_ecdsa', 'id_ed25519'),
-                                    ssh_dir.iterdir()), None)
-    }
+    ssh_dir = Path('~/.ssh/').expanduser()
 
     # Prepare values from ssh config
     cfg_vals = {}
@@ -79,16 +101,15 @@ def run_tool_runner():
         if isinstance(cfg_vals['identityfile'], list):
             cfg_vals['identityfile'] = cfg_vals['identityfile'][0]
 
-    # Prepare values from arguments
-    arg_vals = {}
-    if ':' in prog_args.remote:
-        arg_vals['hostname'], arg_vals['port'] = prog_args.remote.split(':')
-    else:
-        arg_vals['hostname'] = prog_args.remote
-    arg_vals['user'] = prog_args.user
-    arg_vals['password'] = prog_args.password
-    arg_vals['identityfile'] = prog_args.identityfile
+    # Prepare default values
+    default_vals = {
+        'port': 22,
+        'identityfile': next(filter(lambda fp: fp.name in ('id_rsa', 'id_dsa',
+                                                           'id_ecdsa', 'id_ed25519'),
+                                    ssh_dir.iterdir()), None)
+    }
 
+    # Prepare result values
     result_kwargs = {
         'interface': prog_args.interface,
         'analyzer': prog_args.analyzer,
@@ -103,8 +124,13 @@ def run_tool_runner():
     if result_kwargs['password'] is None and result_kwargs['identityfile'] is None:
         parser.error('the following arguments are required: -p/--password or -k/--identityfile')
 
+    logging.info(f'Result values: {result_kwargs}')
+
     with ssh_connection(**result_kwargs) as connected_client:
         result_kwargs['tcpdump_path'] = get_tcpdump_path(connected_client)
+
+        if not sudoers_config_is_work(connected_client):
+            raise RuntimeError('Cannot run "sudo tcpdump" without password')
 
         remote_interface = result_kwargs['interface']
         available_interfaces = get_remote_interfaces(connected_client)
