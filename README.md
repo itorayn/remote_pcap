@@ -64,7 +64,7 @@ pip3 install git+https://github.com/itorayn/remote_pcap.git#egg=remote_pcap
 
 ## Usage
 ```
-usage: remote_pcap [-h] -i INTERFACE [-u USER] [-p PASSWORD] [-k] [-a {wireshark,sngrep}] REMOTE HOST
+usage: remote_pcap [-h] -i INTERFACE [-u USER] [-p PASSWORD] [-k IDENTITYFILE] [-a {wireshark,sngrep}] REMOTE HOST
 
 Remote capture network trafic
 
@@ -78,7 +78,8 @@ options:
   -u USER, --user USER  Username for login
   -p PASSWORD, --password PASSWORD
                         Password for login
-  -k, --identityfile    File with custom private key
+  -k IDENTITYFILE, --identityfile IDENTITYFILE
+                        File with custom private key
   -a {wireshark,sngrep}, --analyzer {wireshark,sngrep}
                         Packet analyzer
 ```
